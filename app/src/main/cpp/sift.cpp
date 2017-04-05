@@ -120,27 +120,46 @@ void Sift::find_keys(){
         for (int dog_level = 1; dog_level < NUM_DOG_PER_OCT-1; dog_level++){
             for (int y = 1; y < dog_arrays[oct_idx]->getHeight(); y++){
                 for (int x = 1; x < dog_arrays[oct_idx]->getWidth() -1 ; x++){
-
                     Key * key = NULL;
-                    checkContrast(x, y, oct_idx, dog_level, &key);
-                    if(key != NULL){
-                        if(checkEdge()){
-                            keys_vec.push_back(*key);
+                    if (is_Max_Min(x,y, oct_idx, dog_level)) {
+                        checkContrast(x, y, oct_idx, dog_level, &key);
+                        if (key != NULL) {
+                            if (checkEdge(x,y, oct_idx, dog_level)) {
+                                keys_vec.push_back(*key);
+                            }
+                            else {
+                                delete key;
+                                key = NULL;
+                            }
                         }
-                        else
-                            delete key;
                     }
-
                 }
             }
-
         }
-
     }
 }
 
-bool Sift::checkEdge( ){
+bool Sift::checkEdge(int x, int y, int oct_idx, int dog_level ){
+    /*
+    double val, dxx, dyy, dxy;
+    Image* cur_img = dog_arrays[oct_idx]->get_image(dog_level);
 
+    val = *cur_img->(x,y) ;
+    dxx = (*(cur_img->(x+1,y)) - *(cur_img->(x-1,y))) - 2.0*val;
+    dyy = (*(cur_img->(x,y+1)) - *(cur_img->(x,y-1))) - 2.0*val;
+    dxy = (*(cur_img->(x+1,y+1)) - *(cur_img->(x-1,y+1)) - *(cur_img->(x+1,y-1)) + *(cur_img->(x-1,y-1)))/4.0;
+
+
+    double tr = dxx + dyy;
+    double det = dxx * dyy - dxy * dxy;
+
+    if( det <= 0 )
+        return true;
+    if( tr * tr / det < CURVE_THRES)
+        return false;
+    */
+
+    return true;
 }
 
 void Sift::checkContrast(int x, int y, int oct_idx, int dog_level, Key** key){

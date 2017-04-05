@@ -1,6 +1,6 @@
 set(pathToProject /Users/hthieu/Desktop/Spring2017/ECE420/Final_Project)
-
 set(pathToOpenCv /Users/hthieu/Desktop/NDK_OpenCv/OpenCV-android-sdk)
+
 cmake_minimum_required(VERSION 3.4.1)
 
 

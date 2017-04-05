@@ -39,7 +39,7 @@ Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobje
     clock_t begin = clock();
 
     Sift s(img);
-
+    s.find_keys();
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 
