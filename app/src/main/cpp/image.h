@@ -19,7 +19,7 @@ public:
 
     ~Image();
 
-    double * operator()(unsigned int x, unsigned int y);
+    double * operator()( int x,  int y);
     Image const & operator=(Image const & other);
 
     void convolve_with_gaussian(double sigma);

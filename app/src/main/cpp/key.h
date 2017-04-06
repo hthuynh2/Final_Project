@@ -5,9 +5,6 @@
 #ifndef FINAL_PROJECT_KEY_H
 #define FINAL_PROJECT_KEY_H
 
-
-#include <opencv2/core/types_c.h>
-
 class Key{
 public:
 

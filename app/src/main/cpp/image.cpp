@@ -60,12 +60,13 @@ void Image::_copy(Image const & other)
 }
 
 
-double * Image::operator()(unsigned int x, unsigned int y)
+double * Image::operator()( int x,  int y)
 {
     if(x >=0 && x <width && y>=0 && y<height)
         return & pixel_ptr[_getLoc(x,y)];
     return NULL;
 }
+
 
 
 Image const & Image::operator=(Image const & other)

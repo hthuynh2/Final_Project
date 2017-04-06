@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+
 #include <vector>
 #include "image.h"
 #include "octave.h"
@@ -26,23 +27,27 @@ Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobje
                                                               jlong matAddrGr) {
 
     Mat& mGr  = *(Mat*)matAddrGr;
-    Image img(mGr);
+    Image  img(mGr);
+
+
+
+
 
  //   test_img.convolve_with_gaussian(sqrt(2));
 //    mGr = Mat(test_img.getHeight(), test_img.getWidth(), test_img.get_pixel_ptr());
 
 
-
     // Mat_<double> img_mat(height, width, pixel_ptr);
 
 // Record end time
+/*
     clock_t begin = clock();
 
     Sift s(img);
     s.find_keys();
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-
+*/
    /*b
     Mat img_mat(img.getHeight(), img.getWidth(),CV_64F, img.get_pixel_ptr());
     Mat base_img_mat;

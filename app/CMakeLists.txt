@@ -13,8 +13,8 @@ add_library(    native-lib
                 SHARED
                 src/main/cpp/native-lib.cpp
                 src/main/cpp/sift_main.cpp
-                src/main/cpp/image.cpp
                 src/main/cpp/sift.cpp
+                src/main/cpp/image.cpp
                 src/main/cpp/constant.cpp
                 src/main/cpp/octave.cpp
                 src/main/cpp/key.cpp
