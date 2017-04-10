@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -26,10 +27,10 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
     private static final String TAG = "MainActivity";
-
+    TextView result_text;
     private CameraBridgeViewBase mOpenCvCameraView;
     static Mat mGray, mRgba;
-
+    private boolean isMatch;
     static int frame_h;
     static int frame_w;
     Button but;
@@ -62,16 +63,26 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        result_text = (TextView) findViewById(R.id.result_text);
+        result_text.setText("Press Button");
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
+
         but = (Button) findViewById(R.id.button);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                test_bool = ! test_bool;
+                if(!test_bool){
+                    test_bool = !test_bool;
+                    onPause();
+                }
+                else{
+                    test_bool = !test_bool;
+                    onResume();
+                }
             }
         });
     }
@@ -79,8 +90,30 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     protected void onPause() {
         super.onPause();
-        if (mOpenCvCameraView != null)
+        if (mOpenCvCameraView != null) {
             mOpenCvCameraView.disableView();
+        }
+        try {
+            Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+
+            isMatch = createImg(mGray.getNativeObjAddr(), elephant_img.getNativeObjAddr());
+            if(isMatch) {
+                result_text.post(new Runnable() {
+                    public void run() {
+                        result_text.setText("Match Found");
+                    }
+                });
+            }
+            else {
+                result_text.post(new Runnable() {
+                    public void run() {
+                        result_text.setText("Match Not Found");
+                    }
+                });
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -113,8 +146,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         Log.d(TAG, "height=" + Integer.toString(frame_h) + " width=" + Integer.toString(width));
     }
 
+
+
     @Override
     public void onCameraViewStopped() {
+
+
     }
 
     @Override
@@ -122,8 +159,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mGray = inputFrame.gray();
         mRgba = inputFrame.rgba();
 
-        if (test_bool)
-            createImg(mGray.getNativeObjAddr());
         return mGray;
     }
 
@@ -180,5 +215,5 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     public native String validate(long matAddrGr, long matAddrRgba);
 
-    public native void createImg(long matAddrGr);
+    public native boolean createImg(long matAddrGr, long matAddrRBF);
 }
