@@ -1,6 +1,7 @@
 package com.example.hthieu.final_project;
 
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,10 +20,18 @@ import org.opencv.android.Utils;
 import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.features2d.DescriptorExtractor;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.FeatureDetector;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
@@ -35,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     static int frame_w;
     Button but;
     static boolean test_bool = false;
-
+    static boolean isProcessing = false;
+    static String file_path;
 
     static {
         System.loadLibrary("native-lib");
@@ -59,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,21 +82,33 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-
         but = (Button) findViewById(R.id.button);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!test_bool){
+                    isProcessing = true;
                     test_bool = !test_bool;
                     onPause();
                 }
                 else{
-                    test_bool = !test_bool;
-                    onResume();
+                    if(!isProcessing) {
+                        test_bool = !test_bool;
+                        onResume();
+                    }
                 }
             }
         });
+        preComputeDesc();
+        long tStart = System.currentTimeMillis();
+
+        for (int i = 0 ; i < 21; i++){
+            Mat temp = loadMat(file_path);
+        }
+        long tEnd = System.currentTimeMillis();
+        long tDelta = tEnd - tStart;
+        double elapsedSeconds = tDelta / 1000.0;
+        Toast.makeText(this, Double.toString(elapsedSeconds), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -93,26 +117,32 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (mOpenCvCameraView != null) {
             mOpenCvCameraView.disableView();
         }
-        try {
-            Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+        if(test_bool) {
+            try {
+                Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+              //  String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/file1";
+                Mat elephan_desc = loadMat(file_path);
+                isMatch = createImg(mGray.getNativeObjAddr(), elephant_img.getNativeObjAddr(), elephan_desc.getNativeObjAddr());
+                if (isMatch) {
+                    result_text.post(new Runnable() {
+                        public void run() {
+                            result_text.setText("Match Found");
+                        }
+                    });
+                } else {
+                    result_text.post(new Runnable() {
+                        public void run() {
+                            result_text.setText("Match Not Found");
+                        }
+                    });
+                }
+                isProcessing = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                isProcessing = false;
+            }
 
-            isMatch = createImg(mGray.getNativeObjAddr(), elephant_img.getNativeObjAddr());
-            if(isMatch) {
-                result_text.post(new Runnable() {
-                    public void run() {
-                        result_text.setText("Match Found");
-                    }
-                });
-            }
-            else {
-                result_text.post(new Runnable() {
-                    public void run() {
-                        result_text.setText("Match Not Found");
-                    }
-                });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "Press Button to back to camera!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -142,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         frame_w = width;
         mRgba = new Mat(height,width, CvType.CV_8UC4);
         mGray = new Mat(height,width, CvType.CV_8UC1);
-
         Log.d(TAG, "height=" + Integer.toString(frame_h) + " width=" + Integer.toString(width));
     }
 
@@ -150,8 +179,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public void onCameraViewStopped() {
-
-
     }
 
     @Override
@@ -159,9 +186,65 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mGray = inputFrame.gray();
         mRgba = inputFrame.rgba();
 
-        return mGray;
+        return mRgba;
     }
 
+
+
+    public void preComputeDesc(){
+        FeatureDetector detector = FeatureDetector.create(FeatureDetector.BRISK);
+        MatOfKeyPoint keypoints = new MatOfKeyPoint();
+        Mat descriptors = new Mat();
+        DescriptorExtractor descriptor;
+        try {
+            Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            detector.detect(elephant_img, keypoints);
+            descriptor = DescriptorExtractor.create(DescriptorExtractor.BRISK);
+            descriptor.compute(elephant_img, keypoints, descriptors);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        file_path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/file1";
+        saveMat(file_path, descriptors);
+    }
+
+    //http://stackoverflow.com/questions/26445747/is-there-a-way-of-storing-opencv-javacv-mat-objects-in-a-database
+    public final void saveMat(String path, Mat mat) {
+        File file = new File(path).getAbsoluteFile();
+        file.getParentFile().mkdirs();
+        try {
+            int cols = mat.cols();
+            byte[] data = new byte[(int) mat.total() * mat.channels()];
+            mat.get(0, 0, data);
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
+                oos.writeObject(cols);
+                oos.writeObject(data);
+                oos.close();
+            }
+        } catch (IOException | ClassCastException ex) {
+            System.err.println("ERROR: Could not save mat to file: " + path);
+        }
+
+
+       // Mat mat1 = loadMat(path);
+    }
+
+    public final Mat loadMat(String path) {
+        try {
+            int cols;
+            byte[] data;
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
+                cols = (int) ois.readObject();
+                data = (byte[]) ois.readObject();
+            }
+            Mat mat = new Mat(data.length / cols, cols, CvType.CV_8UC1);
+            mat.put(0, 0, data);
+            return mat;
+        } catch (IOException | ClassNotFoundException | ClassCastException ex) {
+            System.err.println("ERROR: Could not load mat from file: " + path);
+        }
+        return null;
+    }
 
 
     private void save_img_to_file(){
@@ -215,5 +298,5 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     public native String validate(long matAddrGr, long matAddrRgba);
 
-    public native boolean createImg(long matAddrGr, long matAddrRBF);
+    public native boolean createImg(long matAddrGr, long matAddrRBF, long descAddr);
 }

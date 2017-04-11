@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include <android/log.h>
 
 
 
@@ -25,16 +26,19 @@ using namespace std;
 extern "C" {
 jboolean JNICALL
 Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobject instance,
-                                                              jlong matAddrGr, jlong addrRgba) {
+                                                              jlong matAddrGr, jlong addrRgba, jlong desc) {
 
     Mat& mGr  = *(Mat*)matAddrGr;
     //Image  img(mGr);
+    __android_log_print(ANDROID_LOG_DEBUG, "MainActivity", "HELOOOOOOOOOOOOOOOO ");
 
-
+    __android_log_write(ANDROID_LOG_DEBUG, "MainActivity", "asdasd");
 
     Mat& mRgb = *(Mat*)addrRgba;
-    Mat desc_query;
+    Mat desc_query ;
     Mat desc_source;
+
+    Mat& desc_source1 =  *(Mat*) desc;
     vector<KeyPoint> v;
     vector<KeyPoint> v1;
 
@@ -44,34 +48,61 @@ Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobje
     detector->detectAndCompute(mGr, NULL, v, desc_query);
     detector->detectAndCompute(mRgb, NULL, v1, desc_source);
 
-  //  detector->detect(mGr, v);
-    for (unsigned int i = 0; i < v.size(); i++) {
-        const KeyPoint& kp = v[i];
-       // circle(mRgb, Point(kp.pt.x, kp.pt.y), 10, Scalar(255,0,0,255));
-        circle(mGr, Point(kp.pt.x, kp.pt.y), 10, Scalar(255,0,0,255));
-    }
-
 
     BFMatcher matcher(NORM_HAMMING);
     std::vector< DMatch > matches;
     std::vector< DMatch > good_matches;
 
-    matcher.match( desc_query, desc_source, matches );
+    if(desc_query.empty() || desc_source.empty())
+        return (jboolean) false;
 
-    double max_dist = 0; double min_dist = 100;
+
+    //matcher.match( desc_query, desc_source, matches );
+    matcher.match( desc_query, desc_source1, matches );
+
+
+
+    if (matches.size() == 0 )
+        return (jboolean) false;
+
+    double max_dist = 0.0;
+    double min_dist = 100.0;
     //-- Quick calculation of max and min distances between keypoints
-    for( int i = 0; i < desc_query.rows; i++ )
-    {   double dist = matches[i].distance;
-        if( dist < min_dist ) min_dist = dist;
-        if( dist > max_dist ) max_dist = dist;
+    for (int i = 0 ; i < matches.size(); i ++){
+        double dist = matches[i].distance;
+        if(max_dist < dist)
+            max_dist = dist;
+        if (min_dist > dist && dist >=0){
+            min_dist = dist;
+        }
     }
-    for( int i = 0; i < desc_query.rows; i++ ) {
-        if( matches[i].distance < 3*min_dist)
+
+    if(min_dist >= 50)
+        return (jboolean) false;
+
+
+    double threshold = 3 * min_dist;
+
+    if(min_dist > 25)
+        threshold = 75;
+    else if (min_dist*2 >= max_dist)
+        threshold = min_dist * 1.1;
+    else if(min_dist*3 >= max_dist)
+        threshold = threshold * 2.4;
+
+
+    for (int i = 0 ; i < matches.size(); i ++){
+        if (matches[i].distance < threshold)
             good_matches.push_back( matches[i]);
     }
+    __android_log_print(ANDROID_LOG_DEBUG, "NDK_TAG", "test int = %d", (int)good_matches.size());
+
+    int good_matches_size = good_matches.size();
+    double match_percentage = 100.0*matches.size()/v.size();
+    double good_match_percentage = 100.0*good_matches_size/matches.size();
 
     //????
-    if (good_matches.size() >= 100) {
+    if (good_matches_size >= 20) {
         return (jboolean )true;
     }
     return (jboolean )false;
