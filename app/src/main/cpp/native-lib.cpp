@@ -1,6 +1,19 @@
 #include <jni.h>
 #include <string>
 #include <opencv2/core.hpp>
+#include <cassert>
+#include <cstring>
+#include <jni.h>
+#include <ctime>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <android/log.h>
+
+
+
+//JNIEXPORT
 
 
 

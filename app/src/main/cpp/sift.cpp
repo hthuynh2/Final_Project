@@ -4,6 +4,60 @@
 
 #include "sift.h"
 
+
+
+
+//
+//if (matches.size() == 0 )
+//return (jboolean) false;
+//
+//double max_dist = 0.0;
+//double min_dist = 100.0;
+////-- Quick calculation of max and min distances between keypoints
+//for (int i = 0 ; i < matches.size(); i ++){
+//double dist = matches[i].distance;
+//if(max_dist < dist)
+//max_dist = dist;
+//if (min_dist > dist && dist >=0){
+//min_dist = dist;
+//}
+//}
+//
+//if(min_dist >= 50)
+//return (jboolean) false;
+//
+//
+//double threshold = 3 * min_dist;
+//
+//if(min_dist > 25)
+//threshold = 75;
+//else if (min_dist*2 >= max_dist)
+//threshold = min_dist * 1.1;
+//else if(min_dist*3 >= max_dist)
+//threshold = threshold * 2.4;
+//
+//
+//for (int i = 0 ; i < matches.size(); i ++){
+//if (matches[i].distance < threshold)
+//good_matches.push_back( matches[i]);
+//}
+//
+//int good_matches_size = good_matches.size();
+//double match_percentage = 100.0*matches.size()/v.size();
+//double good_match_percentage = 100.0*good_matches_size/matches.size();
+//
+////????
+//if (good_matches_size >= 10) {
+//return (jboolean )true;
+//}
+//return (jboolean )false;
+
+
+
+
+
+
+
 Sift::Sift(Image& _baseImg){
 
     octave_arrays = new Octave*[NUM_OCT];

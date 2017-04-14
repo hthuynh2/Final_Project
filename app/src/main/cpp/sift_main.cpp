@@ -24,6 +24,185 @@ using namespace cv;
 using namespace std;
 
 extern "C" {
+
+JNIEXPORT jint JNICALL
+Java_com_example_hthieu_final_1project_MainActivity_checkImg(JNIEnv *env, jobject instance,
+                                                             jlong matAddrGr, jlong descAddr0,
+                                                             jlong descAddr1, jlong descAddr2,
+                                                             jlong descAddr3, jlong descAddr4,
+                                                             jlong descAddr5, jlong descAddr6,
+                                                             jlong descAddr7, jlong descAddr8,
+                                                             jlong descAddr9, jlong descAddr10,
+                                                             jlong descAddr11, jlong descAddr12,
+                                                             jlong descAddr13, jlong descAddr14,
+                                                             jlong descAddr15, jlong descAddr16,
+                                                             jlong descAddr17, jlong descAddr18,
+                                                             jlong descAddr19, jlong descAddr20) {
+
+    // TODO
+
+    int num = 3;
+    Mat& mGr  = *(Mat*)matAddrGr;
+    Mat desc_query ;
+    Mat& desc0 =  *(Mat*) descAddr0;
+    Mat& desc1 =  *(Mat*) descAddr1;
+    Mat& desc2 =  *(Mat*) descAddr2;
+
+    vector<KeyPoint> v;
+
+    Ptr<BRISK> detector = BRISK::create();
+    detector->detectAndCompute(mGr, NULL, v, desc_query);
+
+    BFMatcher matcher(NORM_HAMMING);
+
+    std::vector< std::vector<DMatch> > matches_vector;
+    std::vector< std::vector<DMatch> > good_matches_vector;
+
+
+    if(desc_query.empty())
+        return -1;
+
+    std::vector<DMatch>  matches0;
+    std::vector<DMatch>  matches1;
+    std::vector<DMatch>  matches2;
+
+    //matcher.match( desc_query, desc_source, matches );
+    matcher.match( desc_query, desc0, matches0 );
+    matcher.match( desc_query, desc1, matches1 );
+    matcher.match( desc_query, desc2, matches2);
+
+    matches_vector.push_back(matches0);
+    matches_vector.push_back(matches1);
+    matches_vector.push_back(matches2);
+
+
+//    matches_vector[0] = matches0;
+//    matches_vector[1] = matches1;
+//    matches_vector[2] = matches2;
+
+
+//    matcher.match( desc_query, desc0, matches_vector[0] );
+//    matcher.match( desc_query, desc1, matches_vector[1] );
+//    matcher.match( desc_query, desc2, matches_vector[2] );
+
+    for (int i = 0; i <num; i ++){
+        std::vector<DMatch>  good_match;
+
+        if (matches_vector[i].size() == 0 ) {
+            good_matches_vector.push_back(good_match);
+            continue;
+        }
+
+        double max_dist = 0.0;
+        double min_dist = 100.0;
+        //-- Quick calculation of max and min distances between keypoints
+        for (int j = 0 ; j < matches_vector[i].size(); j ++){
+            double dist = (matches_vector[i])[j].distance;
+            if(max_dist < dist)
+                max_dist = dist;
+            if (min_dist > dist && dist >=0){
+                min_dist = dist;
+            }
+        }
+
+
+        if(min_dist >= 50){
+            good_matches_vector.push_back(good_match);
+            continue;
+        }
+
+        double threshold = 3 * min_dist;
+
+        if(min_dist > 25)
+            threshold = 75;
+        else if (min_dist*2 >= max_dist)
+            threshold = min_dist * 1.1;
+        else if(min_dist*3 >= max_dist)
+            threshold = threshold * 2.4;
+
+
+
+        for (int j= 0 ; j < matches_vector[i].size(); j ++){
+            if (matches_vector[i][j].distance < threshold)
+                good_match.push_back(matches_vector[i][j]);
+            //    good_matches_vector[i].push_back( matches_vector[i][j]);
+        }
+        good_matches_vector.push_back(good_match);
+    }
+
+
+    int max_idx = -1;
+    long max_size = -1;
+
+    if(good_matches_vector.size() == 0 )
+        return -1;
+
+    for(int i = 0; i < num; i ++){
+        int temp = (int) good_matches_vector[i].size();
+        if( temp > max_size){
+            max_size = good_matches_vector[i].size();
+            max_idx  = i;
+        }
+    }
+    if(max_size <= 10)
+        return -1;
+    return  max_idx;
+}
+
+
+jint JNICALL
+Java_com_example_hthieu_final_1project_MainActivity_callcheckImg(JNIEnv *env, jobject thisobject,
+                                                                 jint vec_num) {
+
+    // TODO
+
+    // Find the required classes
+    jclass thisclass = env->GetObjectClass(thisobject);
+    jclass matclass = env->FindClass("org/opencv/core/Mat");
+
+    // Get methods and fields
+    jmethodID getPtrMethod = env->GetMethodID(matclass, "getNativeObjAddr", "()J");
+    jfieldID mgrayfieldid = env->GetFieldID(thisclass, "mGray", "Lorg/opencv/core/Mat;");
+    jfieldID bufimgsfieldid = env->GetFieldID(thisclass, "bufImgs", "[Lorg/opencv/core/Mat;");
+
+
+    // Let's start: Get the fields
+    jobject mgray = env->GetObjectField(thisobject, mgrayfieldid);
+    jobjectArray bufimgsArray = (jobjectArray)env->GetObjectField(thisobject, bufimgsfieldid);
+
+    // Convert the array
+    cv::Mat nativeBufImgs[vec_num];
+    for (int i = 0; i < vec_num; i++)
+        nativeBufImgs[i] = *(cv::Mat*)env->CallLongMethod(env->GetObjectArrayElement(bufimgsArray, i), getPtrMethod);
+
+    // Get the address for mRgba
+    cv::Mat* mgrayptr = (cv::Mat*)env->CallLongMethod(mgray, getPtrMethod);
+
+    // We're done! Call the method and return!
+    //
+    // return nativeCode(mgrayptr, nativeBufImgs);
+    return 0;
+}
+
+
+
+void JNICALL
+Java_com_example_hthieu_final_1project_MainActivity_getDesc(JNIEnv *env, jobject instance,
+                                                            jlong addrImg, jlong addDesc) {
+
+
+    Mat& mGr  = *(Mat*)addrImg;
+    Mat& desc =  *(Mat*) addDesc;
+
+    vector<KeyPoint> v;
+    Ptr<BRISK> detector = BRISK::create();
+
+    detector->detectAndCompute(mGr, NULL, v, desc);
+    return;
+}
+
+
+
 jboolean JNICALL
 Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobject instance,
                                                               jlong matAddrGr, jlong addrRgba, jlong desc) {
@@ -102,7 +281,7 @@ Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobje
     double good_match_percentage = 100.0*good_matches_size/matches.size();
 
     //????
-    if (good_matches_size >= 20) {
+    if (good_matches_size >= 10) {
         return (jboolean )true;
     }
     return (jboolean )false;
@@ -173,6 +352,8 @@ Java_com_example_hthieu_final_1project_MainActivity_createImg(JNIEnv *env, jobje
 
 
 }
+
+
 
 
 
