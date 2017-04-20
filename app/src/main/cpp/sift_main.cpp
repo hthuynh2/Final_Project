@@ -41,12 +41,17 @@ Java_com_example_hthieu_final_1project_MainActivity_checkImg(JNIEnv *env, jobjec
 
     // TODO
 
-    int num = 3;
+    int num = 8;
     Mat& mGr  = *(Mat*)matAddrGr;
     Mat desc_query ;
     Mat& desc0 =  *(Mat*) descAddr0;
     Mat& desc1 =  *(Mat*) descAddr1;
     Mat& desc2 =  *(Mat*) descAddr2;
+    Mat& desc3 =  *(Mat*) descAddr3;
+    Mat& desc4 =  *(Mat*) descAddr4;
+    Mat& desc5 =  *(Mat*) descAddr5;
+    Mat& desc6 =  *(Mat*) descAddr6;
+    Mat& desc7 =  *(Mat*) descAddr7;
 
     vector<KeyPoint> v;
 
@@ -65,15 +70,30 @@ Java_com_example_hthieu_final_1project_MainActivity_checkImg(JNIEnv *env, jobjec
     std::vector<DMatch>  matches0;
     std::vector<DMatch>  matches1;
     std::vector<DMatch>  matches2;
+    std::vector<DMatch>  matches3;
+    std::vector<DMatch>  matches4;
+    std::vector<DMatch>  matches5;
+    std::vector<DMatch>  matches6;
+    std::vector<DMatch>  matches7;
 
     //matcher.match( desc_query, desc_source, matches );
     matcher.match( desc_query, desc0, matches0 );
     matcher.match( desc_query, desc1, matches1 );
     matcher.match( desc_query, desc2, matches2);
+    matcher.match( desc_query, desc3, matches3);
+    matcher.match( desc_query, desc4, matches4);
+    matcher.match( desc_query, desc5, matches5);
+    matcher.match( desc_query, desc6, matches6);
+    matcher.match( desc_query, desc7, matches7);
 
     matches_vector.push_back(matches0);
     matches_vector.push_back(matches1);
     matches_vector.push_back(matches2);
+    matches_vector.push_back(matches3);
+    matches_vector.push_back(matches4);
+    matches_vector.push_back(matches5);
+    matches_vector.push_back(matches6);
+    matches_vector.push_back(matches7);
 
 
 //    matches_vector[0] = matches0;
