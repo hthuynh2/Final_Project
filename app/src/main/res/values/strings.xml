@@ -1,3 +1,45 @@
 <resources>
     <string name="app_name">Final_Project</string>
+
+    <string name="hello">The Department of Electrical and Computer Engineering offers an education that allows students to master the fundamentals that will make them outstanding engineers. Learn more about what sets ECE ILLINOIS apart, and how you might fit in our program.
+    </string>
+
+    <string name="elephant"> THIS IS AN ELEPHANT\n THERE IS NOTHING TO SHOW. PLEASE PRESS BUTTON TO GO BACK
+    </string>
+
+    <string name="union">
+    The Illini Union located at 1401 West Green Street in Urbana, Illinois, on the campus of the University of Illinois at Urbana-Champaign, is the student union for the University.The building was dedicated on November 1, 1941 as the campus home for student organizations, meetings, and student programs and activities, replacing University Hall. It was constructed in cooperation with the University of Illinois Foundation, which secured funding for the construction through a $525,820 Public Works Administration grant and a $656,000 loan which was later repaid through student fees. Today, Illini Union contains the Illini Union Hotel, a credit union, a convenience store, information services, CITES (Campus IT) instructional facility, quick-service restaurants, a bowling alley and arcade, student performance spaces, and office space for Registered Student Organizations, student government, Student Legal Services, Student Tenant Union, LGBT Resource Center, and Union administration.The Illini Union Board serves as a campus wide programming organization and as the advisory Board for the Illini Union Director.
+    </string>
+
+    <string name="eng_hall">
+        Engineering Hall is an administrative building at the University of Illinois at Urbana-Champaign. It is located in the south end of the Bardeen Quadrangle on Green Street in Urbana, Illinois, facing the Illini Union. Engineering Hall serves all disciplines within the UIUC College of Engineering and is well known for representing the school colors with its orange bricks and blue roof. In addition to many offices and conference room, Engineering Hall also includes two computer labs and four lecture halls. Engineering Hall also houses many engineering-based student organizations in its offices.
+    </string>
+
+    <string name="beckman">
+    OVERVIEW OF THE BECKMAN INSTITUTE
+    The Institute primary mission is to foster interdisciplinary work of the highest quality, transcending many of the limitations inherent in traditional university organizations and structures. The Institute was founded on the premise that reducing the barriers between traditional scientific and technological disciplines can yield research advances that more conventional approaches cannot.
+    </string>
+
+    <string name="eng_lib">
+        The Grainger Engineering Library is a library at the University of Illinois at Urbana-Champaign College of Engineering dedicated to all disciplines of engineering at the University. It is situated on the north side of the Bardeen Quad on the engineering campus along Springfield Avenue.[1] The Grainger Engineering Library is the largest library in the United States dedicated to the study of engineering. It is one of several "departmental" libraries that constitute the University of Illinois at Urbana-Champaign University Library.
+    </string>
+
+
+    <string name="panda_express">
+    Panda Express is a fast casual restaurant chain which serves American Chinese cuisine. It is the largest Asian segment restaurant chain in the United States,[5] where it was founded and is mainly located (in addition to other countries and territories in North America and Asia). Panda Express restaurants were traditionally located in shopping mall food courts, but the chain now operates units in many other environments and formats, including stand-alone restaurants, as well as universities, casinos, airports, military bases, amusement parks and other venues.
+    </string>
+
+    <string name="csl">
+    The Coordinated Science Laboratory (CSL) is a major scientific research laboratory at the University of Illinois at Urbana-Champaign. With deep roots in information technology, CSL has invented and deployed many landmark innovations, such as the electric vacuum gyroscope, the first computer-assisted instructional program and the plasma TV. Today, research thrusts include computer vision, economics and energy systems, information trust, neuroengineering, parallel computing, robotics and more.
+    </string>
+
+    <string name="eceb">
+The ECE Building, located at 306 N. Wright St., Urbana, is nearly twice the size of the department‘s former home, Everitt Laboratory. At 230,000 square feet, the new building is full of more than 20 lab spaces intended for student instruction and learning. These labs continue ECE ILLINOIS‘ tradition of hands-on learning, especially on cutting-edge topics like nanofabrication, optics, control, and robotics.
+
+In the Open Projects Lab, students will have access to state-of-the-art equipment for use in non-classroom projects. Students will be able to pursue their passions, innovating and exper­imenting, in this unique maker-space.
+
+The building gives students and faculty members access to many collaborative spaces, including a grand lobby filled with seating, and multiple conference rooms. Graduate students are also sharing large, open workspaces, which allow for communication among those in different re­search areas.
+    </string>
+
+
 </resources>

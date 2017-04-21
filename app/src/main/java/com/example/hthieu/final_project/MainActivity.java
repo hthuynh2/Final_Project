@@ -1,7 +1,7 @@
 package com.example.hthieu.final_project;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,10 +20,6 @@ import org.opencv.android.Utils;
 import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfKeyPoint;
-import org.opencv.features2d.DescriptorExtractor;
-import org.opencv.features2d.DescriptorMatcher;
-import org.opencv.features2d.FeatureDetector;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,13 +27,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
 
     private static final String TAG = "MainActivity";
     TextView result_text;
-    static private Mat elep_mat, union_mat, eng_hall_mat;
+    static private Mat elep_mat, union_mat, eng_hall_mat, beckman_mat, eng_lib_mat, panda_exp_mat, csl_mat, eceb_mat;
 
 
     private CameraBridgeViewBase mOpenCvCameraView;
@@ -55,11 +50,20 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     static String file_eng_hall;
 
 
+    static String file_beckman;
+    static String file_eng_lib;
+    static String file_panda_exp;
+    static String file_csl;
+    static String file_eceb;
+    private int match_number ;
+
+
 
     static {
         System.loadLibrary("native-lib");
         System.loadLibrary("opencv_java3");
     }
+
 
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -91,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
+        match_number = -1;
         but = (Button) findViewById(R.id.button);
         but.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,12 +103,58 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 if(!test_bool){
                     isProcessing = true;
                     test_bool = !test_bool;
-                    onPause();
+//                    onPause();
+                    match_number = -1;
+                    if (mOpenCvCameraView != null) {
+                        mOpenCvCameraView.disableView();
+                    }
+                        //Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+                        match_number = checkImg(mGray.getNativeObjAddr(), elep_mat.getNativeObjAddr(), union_mat.getNativeObjAddr(),eng_hall_mat.getNativeObjAddr(),beckman_mat.getNativeObjAddr(),eng_lib_mat.getNativeObjAddr()
+                                ,panda_exp_mat.getNativeObjAddr(),csl_mat.getNativeObjAddr(),eceb_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
+                                ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
+                                ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr());
+
+//                            switch (match_number){
+//                                case 0 :    result_text.setText("Elephant!");
+//                                    break;
+//                                case 2 :    result_text.setText("Union!!");
+//                                    break;
+//                                case 1 :    result_text.setText("Engineering Hall");
+//                                    break;
+//                                case 3 :    result_text.setText("Beckman Building");
+//                                    break;
+//                                case 4 :    result_text.setText("Engineering Library");
+//                                    break;
+//                                case 5 :    result_text.setText("Panda Express");
+//                                    break;
+//                                case 6 :    result_text.setText("CSL");
+//                                    break;
+//                                case 7 :    result_text.setText("ECE Building");
+//                                    break;
+//                                default:    result_text.setText("Not Found");
+//                                    break;
+//                            }
+                        isProcessing = false;
+
+                    if (match_number != -1){
+                        Intent new_act = new Intent(getApplicationContext(), Main2Activity.class);
+                        new_act.putExtra("id", match_number);
+                        match_number = -1;
+                        startActivity(new_act);
+                    }
+                    else {
+                        result_text.setText("Not Found");
+                        Toast.makeText(getBaseContext(), "Press Button to back to camera!", Toast.LENGTH_LONG).show();
+
+                    }
                 }
                 else{
                     if(!isProcessing) {
                         test_bool = !test_bool;
-                        onResume();
+                        if (mOpenCvCameraView != null ) {
+                            mOpenCvCameraView.enableView();
+                        }
+//                        onResume();
                     }
                 }
             }
@@ -114,18 +165,28 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         file_union = Environment.getExternalStorageDirectory().getAbsolutePath() +"/union.txt";
         file_eng_hall = Environment.getExternalStorageDirectory().getAbsolutePath() +"/eng_hall.txt";
 
-        preComputeDesc();
+
+        file_beckman = Environment.getExternalStorageDirectory().getAbsolutePath() +"/beckman.txt";
+        file_eng_lib = Environment.getExternalStorageDirectory().getAbsolutePath() +"/eng_lib.txt";
+        file_panda_exp = Environment.getExternalStorageDirectory().getAbsolutePath() +"/panda_exp.txt";
+        file_csl = Environment.getExternalStorageDirectory().getAbsolutePath() +"/csl.txt";
+        file_eceb = Environment.getExternalStorageDirectory().getAbsolutePath() +"/eceb.txt";
+
+
+//        preComputeDesc();
         long tStart = System.currentTimeMillis();
 
         elep_mat = loadMat(file_elep);
         union_mat = loadMat(file_union);
         eng_hall_mat = loadMat(file_eng_hall);
 
+        beckman_mat = loadMat(file_beckman);
+        eng_lib_mat = loadMat(file_eng_lib);
+        panda_exp_mat = loadMat(file_panda_exp);
+        csl_mat = loadMat(file_csl);
+        eceb_mat = loadMat(file_eceb);
 
 
-//        for (int i = 0 ; i < 21; i++){
-//            Mat temp = loadMat(file_path);
-//        }
         long tEnd = System.currentTimeMillis();
         long tDelta = tEnd - tStart;
         double elapsedSeconds = tDelta / 1000.0;
@@ -138,62 +199,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (mOpenCvCameraView != null) {
             mOpenCvCameraView.disableView();
         }
-        if(test_bool) {
-            try {
-                Mat elephant_img = Utils.loadResource(this, R.drawable.elephant, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
-              //  Mat elephan_desc = loadMat(file_path);
-//                bufImgs[0] = loadMat(file_path);
-
-//                callcheckImg(1);
-
-//                isMatch = createImg(mGray.getNativeObjAddr(), elephant_img.getNativeObjAddr(), elephan_desc.getNativeObjAddr());
-
-
-                int match_number;
-                match_number = checkImg(mGray.getNativeObjAddr(), elep_mat.getNativeObjAddr(), union_mat.getNativeObjAddr(),eng_hall_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
-                        ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
-                        ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
-                        ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr());
-
-                switch (match_number){
-                    case 0 :    result_text.setText("Elephant!");
-                                break;
-                    case 2 :    result_text.setText("Union!!");
-                                break;
-                    case 1 :    result_text.setText("Engineering Hall");
-                                break;
-                    default:    result_text.setText("Not Found");
-                                break;
-                }
-
-
-
-//                if (isMatch) {
-//                    result_text.post(new Runnable() {
-//                        public void run() {
-//                            result_text.setText("Match Found");
-//                        }
-//                    });
-//                } else {
-//                    result_text.post(new Runnable() {
-//                        public void run() {
-//                            result_text.setText("Match Not Found");
-//                        }
-//                    });
-//                }
-                isProcessing = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-                isProcessing = false;
-            }
-
-            Toast.makeText(getBaseContext(), "Press Button to back to camera!", Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
@@ -233,17 +245,15 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         return mRgba;
     }
 
-
-
     public void preComputeDesc(){
         Mat elephan_desc = new Mat();
-//        Mat beckman_desc = new Mat();
         Mat eng_hall_desc = new Mat();
         Mat union_desc = new Mat();
         Mat beckman_desc = new Mat();
         Mat eng_lib_desc = new Mat();
         Mat panda_exp_desc = new Mat();
         Mat csl_desc = new Mat();
+        Mat eceb_desc = new Mat();
 
 
         try {
@@ -251,25 +261,38 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             getDesc( img1.getNativeObjAddr(), elephan_desc.getNativeObjAddr());
 
             Mat eng_hall = Utils.loadResource(this, R.drawable.eng_hall, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
-//            Mat beckman = Utils.loadResource(this, R.drawable.beckman, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
             getDesc( eng_hall.getNativeObjAddr(), eng_hall_desc.getNativeObjAddr());
 
             Mat union = Utils.loadResource(this, R.drawable.union, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
             getDesc( union.getNativeObjAddr(), union_desc.getNativeObjAddr());
 
+            Mat beckman= Utils.loadResource(this, R.drawable.beckman_0, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            getDesc( beckman.getNativeObjAddr(), beckman_desc.getNativeObjAddr());
+
+            Mat eng_lib = Utils.loadResource(this, R.drawable.eng_lib_0, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            getDesc( eng_lib.getNativeObjAddr(), eng_lib_desc.getNativeObjAddr());
+
+            Mat panda_exp = Utils.loadResource(this, R.drawable.panda_exp, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            getDesc( panda_exp.getNativeObjAddr(), panda_exp_desc.getNativeObjAddr());
+
+            Mat csl = Utils.loadResource(this, R.drawable.csl_0, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            getDesc( csl.getNativeObjAddr(), csl_desc.getNativeObjAddr());
+
+            Mat eceb = Utils.loadResource(this, R.drawable.eceb0, CvType.CV_8UC1);//Highgui.CV_LOAD_IMAGE_COLOR);
+            getDesc( eceb.getNativeObjAddr(), eceb_desc.getNativeObjAddr());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-
-
         saveMat(file_elep, elephan_desc);
         saveMat(file_union, eng_hall_desc);
         saveMat(file_eng_hall, union_desc);
-
-        // saveMat(file_path, descriptors);
+        saveMat(file_beckman, beckman_desc);
+        saveMat(file_eng_lib, eng_lib_desc);
+        saveMat(file_panda_exp, panda_exp_desc);
+        saveMat(file_csl, csl_desc);
+        saveMat(file_eceb, eceb_desc);
     }
 
     //http://stackoverflow.com/questions/26445747/is-there-a-way-of-storing-opencv-javacv-mat-objects-in-a-database
@@ -291,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         }
 
 
-       // Mat mat1 = loadMat(path);
+        // Mat mat1 = loadMat(path);
     }
 
     public final Mat loadMat(String path) {
@@ -370,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                                long descAddr5, long descAddr6, long descAddr7, long descAddr8, long descAddr9, long descAddr10,
                                long descAddr11, long descAddr12, long descAddr13, long descAddr14,
                                long descAddr15, long descAddr16, long descAddr17, long descAddr18, long descAddr19, long descAddr20
-                               );
+    );
     public native boolean createImg(long matAddrGr, long matAddrRBF, long descAddr);
 
     public native void getDesc(long addrImg, long addDesc);
