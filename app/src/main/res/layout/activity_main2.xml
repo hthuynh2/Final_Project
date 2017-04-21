@@ -41,17 +41,20 @@
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="show me inside"
+        android:text="show inside"
         android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/textView" />
+        android:layout_alignEnd="@+id/textView"
+        android:layout_toRightOf="@+id/button4"
+        />
 
     <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SHOW me MAP"
+        android:text="SHOW MAP"
         android:layout_marginEnd="11dp"
         android:layout_alignEnd="@+id/textView2"
         android:layout_alignBottom="@+id/button"
+        android:layout_toRightOf="@+id/button2"
         android:layout_below="@+id/textView" />
 </RelativeLayout>

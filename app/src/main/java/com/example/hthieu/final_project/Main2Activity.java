@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 public class Main2Activity extends AppCompatActivity {
 
-    Button button_back;
+    Button button_back, button_show_inside, button_show_map;
     TextView tv, tv1;
     int match_number;
     @Override
@@ -23,6 +23,7 @@ public class Main2Activity extends AppCompatActivity {
 
         tv = (TextView) findViewById(R.id.textView);
         tv1 = (TextView) findViewById(R.id.textView2);
+
         button_back = (Button) findViewById(R.id.button2);
         button_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,7 +31,18 @@ public class Main2Activity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         });
+
         loadText();
+        button_show_inside = (Button) findViewById(R.id.button3);
+        button_show_inside.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent new_act = new Intent(getApplicationContext(), Main3Activity.class);
+                new_act.putExtra("id", match_number);
+                startActivity(new_act);
+            }
+        });
+
     }
 
     private void loadText(){

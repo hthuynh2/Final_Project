@@ -210,13 +210,11 @@ void JNICALL
 Java_com_example_hthieu_final_1project_MainActivity_getDesc(JNIEnv *env, jobject instance,
                                                             jlong addrImg, jlong addDesc) {
 
-
     Mat& mGr  = *(Mat*)addrImg;
     Mat& desc =  *(Mat*) addDesc;
 
     vector<KeyPoint> v;
     Ptr<BRISK> detector = BRISK::create();
-
     detector->detectAndCompute(mGr, NULL, v, desc);
     return;
 }

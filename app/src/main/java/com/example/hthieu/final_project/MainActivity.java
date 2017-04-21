@@ -113,27 +113,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                                 ,panda_exp_mat.getNativeObjAddr(),csl_mat.getNativeObjAddr(),eceb_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
                                 ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr()
                                 ,elep_mat.getNativeObjAddr(),elep_mat.getNativeObjAddr());
-
-//                            switch (match_number){
-//                                case 0 :    result_text.setText("Elephant!");
-//                                    break;
-//                                case 2 :    result_text.setText("Union!!");
-//                                    break;
-//                                case 1 :    result_text.setText("Engineering Hall");
-//                                    break;
-//                                case 3 :    result_text.setText("Beckman Building");
-//                                    break;
-//                                case 4 :    result_text.setText("Engineering Library");
-//                                    break;
-//                                case 5 :    result_text.setText("Panda Express");
-//                                    break;
-//                                case 6 :    result_text.setText("CSL");
-//                                    break;
-//                                case 7 :    result_text.setText("ECE Building");
-//                                    break;
-//                                default:    result_text.setText("Not Found");
-//                                    break;
-//                            }
                         isProcessing = false;
 
                     if (match_number != -1){
@@ -154,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         if (mOpenCvCameraView != null ) {
                             mOpenCvCameraView.enableView();
                         }
-//                        onResume();
                     }
                 }
             }
@@ -190,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         long tEnd = System.currentTimeMillis();
         long tDelta = tEnd - tStart;
         double elapsedSeconds = tDelta / 1000.0;
-        Toast.makeText(this, Double.toString(elapsedSeconds), Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, Double.toString(elapsedSeconds), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -204,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     protected void onResume() {
         super.onResume();
-
 
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
